@@ -1,0 +1,69 @@
+type Club @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+  country: String!
+  Coaches: [Coaches] @hasMany(indexName: "byClub", fields: ["id"])
+  Teamleader: [Teamleader] @hasMany(indexName: "byClub", fields: ["id"])
+  Players: [Players] @hasMany(indexName: "byClub", fields: ["id"])
+}
+
+type Admin @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  username: String!
+  password: String!
+  rank: Int!
+}
+
+type Teamleader @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  username: String!
+  password: String
+  clubID: ID @index(name: "byClub")
+  Statistics: [Statistics] @hasMany(indexName: "byTeamleader", fields: ["id"])
+  untitledfield: String
+  Coaches: [Coaches] @hasMany(indexName: "byTeamleader", fields: ["id"])
+}
+
+type Coaches @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  username: String!
+  password: String!
+  created: AWSDate
+  clubID: ID @index(name: "byClub")
+  Players: [Players] @manyToMany(relationName: "CoachesPlayers")
+  Trainings: [Training] @hasMany(indexName: "byCoaches", fields: ["id"])
+  teamleaderID: ID @index(name: "byTeamleader")
+}
+
+type Training @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  date: AWSDate!
+  type: String!
+  coachesID: ID @index(name: "byCoaches")
+}
+
+type Players @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  firstname: String!
+  lastname: String
+  birthdate: AWSDate
+  clubID: ID @index(name: "byClub")
+  coachess: [Coaches] @manyToMany(relationName: "CoachesPlayers")
+  Statistics: [Statistics] @hasMany(indexName: "byPlayers", fields: ["id"])
+}
+
+type Statistics @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  pace: Float
+  acceleration: Float
+  agility: Int
+  jumping_reach: Int
+  dribbling: Int
+  short_passing: Int
+  long_passing: Int
+  stamina: Int
+  shooting: Int
+  playersID: ID @index(name: "byPlayers")
+  teamleaderID: ID @index(name: "byTeamleader")
+}
+ 
